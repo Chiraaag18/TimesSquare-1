@@ -28,6 +28,7 @@ dependencies:
   url_launcher: ^5.5.0
   translator: ^0.1.4
   flutter_web_browser: ^0.11.0
+  share: ^0.6.4+3
   
   
 
@@ -40,6 +41,14 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.7.5
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/newss.png"
+  adaptive_icon_background: "assets/splash.png"
+
 
   
 
@@ -65,6 +74,8 @@ flutter:
     - assets/hat.png
     - assets/conference.png
     - assets/airplane.png
+    - assets/icon.png
+    - assets/newss.png
     
 
   # An image asset can refer to one or more resolution-specific "variants", see

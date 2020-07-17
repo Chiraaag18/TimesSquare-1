@@ -14,13 +14,29 @@ class _CategoryNewsState extends State<CategoryNews> {
  
  
  String categoryName;
+ String categoryName1;
  String categoryUrl;
  List data = [];
  bool isloading=true;
+ 
 
   fetchnews() async {
+   if(categoryName=='Covid-19')
+    categoryName1='health';
+  else if(categoryName=='Sports')
+    categoryName1='sports';
+  else if(categoryName=='Entertainment')
+   categoryName1='entertainment';
+   else if(categoryName=='Business')
+    categoryName1='business';
+  else if(categoryName=='Technology')
+    categoryName1='technology';
+  else if(categoryName=='Science')
+   categoryName1='science';
+  else if(categoryName=='General')
+   categoryName1='general';
     var response = await http.get(
-        'https://newsapi.org/v2/everything?q=$categoryName&pageSize=90&sortBy=popularity&apiKey=5bdee0d2641c4e6092827ab728d8b9d3');
+        categoryName=='Travel'|| categoryName=='Fashion' || categoryName=='Politics'?'https://newsapi.org/v2/everything?q=$categoryName&sortBy=popularity&pageSize=30&apiKey=5bdee0d2641c4e6092827ab728d8b9d3' :'https://newsapi.org/v2/top-headlines?country=in&category=$categoryName1&pageSize=30&apiKey=5bdee0d2641c4e6092827ab728d8b9d3');
     setState(() {
       var converted = json.decode(response.body);
       data = converted['articles'];

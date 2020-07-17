@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:share/share.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
@@ -50,7 +51,8 @@ class NewsTile extends StatelessWidget {
                       desc,
                       maxLines: 2,
                       style: TextStyle(color: Colors.black54, fontSize: 14),
-                    )
+                    ),
+                    Row(children: <Widget>[SizedBox(width:305),IconButton(icon: Icon(Icons.share),onPressed: ()=>Share.share('Hey Check this news out  '+ posturl),)])
                   ],
                 ),
               ),
