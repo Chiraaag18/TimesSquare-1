@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -33,23 +34,7 @@ class CustomAppBar extends PreferredSize {
           BoxShadow(blurRadius: 25.0, spreadRadius: 5.0, color: Colors.white)
         ],
       ),
-      child: Column(
-        children: <Widget>[
-          SizedBox(height: 40),
-          Row(
-            children: <Widget>[
-              SizedBox(width: 140),
-              Text('Times ',
-                  style: GoogleFonts.blackHanSans(
-                      textStyle: TextStyle(color: Colors.black, fontSize: 20))),
-              Image.asset(
-                'assets/newss.png',
-                height: 50,
-              ),
-            ],
-          ),
-        ],
-      ),
+      child: this.child
     );
   }
 }
@@ -83,6 +68,22 @@ class _HomeScreenState extends State<HomeScreen> {
   bool ishindi = false;
   bool isenglish = false;
   bool isloading = true;
+
+  Future _showNotificationWithDefaultSound() async {
+    var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+        'your channel id', 'your channel name', 'your channel description',
+        importance: Importance.Max, priority: Priority.High);
+    var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+    var platformChannelSpecifics = new NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await FlutterLocalNotificationsPlugin().show(
+      0,
+      'Hey ! Dont Forget to catch up on some news today!',
+      'Tap here to read some.',
+      platformChannelSpecifics,
+      payload: 'Default_Sound',
+    );
+  }
 
   fetchnews() async {
     var response = await http.get(
@@ -232,8 +233,8 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(height: 15),
               Center(
                 child: FlatButton(
-                  onPressed: () =>
-                      Share.share('Hey! Check this news out  ' + data[i]['url']),
+                  onPressed: () => Share.share(
+                      'Hey! Check this news out  ' + data[i]['url']),
                   child: Icon(
                     Icons.share,
                     color: Colors.white,
@@ -246,39 +247,113 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ));
   }
-
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  Future onSelectNotification(String payload) async {
+    showDialog(
+      context: context,
+      builder: (_) {
+        
+        Navigator.of(context).pushNamed('/home_screen');
+      });}
   void initState() {
     super.initState();
     fetchnews();
+     var initializationSettingsAndroid =
+        new AndroidInitializationSettings('@mipmap/ic_launcher'); 
+    var initializationSettingsIOS = new IOSInitializationSettings();
+    var initializationSettings = new InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
   }
 
   String translateddes;
   String translatedtit;
   bool ischanged = false;
+  bool isSwitched = false;
 
   final translator = GoogleTranslator();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        drawer: Drawer(
+              child: ListView(
+    // Important: Remove any padding from the ListView.
+    padding: EdgeInsets.zero,
+    children: <Widget>[
+      Container(
+        height: 100,
+        child: DrawerHeader(
+          child: Row(
+            children: <Widget>[
+              Text('Options',style: TextStyle(fontSize:25,fontWeight: FontWeight.bold),),
+              SizedBox(width:10),
+              Icon(Icons.settings)
+            ],
+          ),
+          decoration: BoxDecoration(
+          color: Colors.blue,
+        )
+          
+        ),
+      ),
+      ListTile(
+        title: Text('About',style: TextStyle(fontSize:18,fontWeight: FontWeight.bold),),
+        onTap: () {
+          // Update the state of the app.
+          // ...
+          _showNotificationWithDefaultSound();
+          
+        },
+      ),
+     Row(
+       children: <Widget>[
+         SizedBox(width:15)
+         ,Text('Notifications',style: TextStyle(fontSize:18,fontWeight: FontWeight.bold),),
+         SizedBox(width:40)
+         ,Switch(value: isSwitched, onChanged: (value) async {
+           isSwitched=value;
+           if(isSwitched)
+             _showDailyAtTime();
+            else
+               await flutterLocalNotificationsPlugin.cancelAll();
+           setState(() {
+             isSwitched=value;
+           });
+           
+          
+           
+         },),
+       ],
+     )
+    ],
+  ),
+
+        ),
         appBar: CustomAppBar(
-            height: 95,
-            child: Column(
-              children: <Widget>[
-                SizedBox(height: 50),
-                Row(
-                  children: <Widget>[
-                    SizedBox(width: 165),
-                    Text('NewsApp',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontStyle: FontStyle.normal,
-                            fontWeight: FontWeight.bold))
-                  ],
-                ),
-              ],
-            )),
+          height: 95,
+          child: Column(
+        children: <Widget>[
+          SizedBox(height: 40),
+          Row(
+            children: <Widget>[
+              Builder(builder: (context)=>
+              FlatButton.icon(onPressed:()=>  Scaffold.of(context).openDrawer(), icon: Icon(Icons.menu), label: Text('')),),
+              SizedBox(width: 60),
+              Text('Times ',
+                  style: GoogleFonts.blackHanSans(
+                      textStyle: TextStyle(color: Colors.black, fontSize: 20))),
+              Image.asset(
+                'assets/newss.png',
+                height: 50,
+              ),
+            ],
+          ),
+        ],
+      ),
+        ),
         body: Column(
           children: <Widget>[
             SizedBox(height: 10),
@@ -326,4 +401,22 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisSize: MainAxisSize.min,
         ));
   }
+   Future<void> _showDailyAtTime() async {
+    var time = Time(9, 0, 0);
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'repeatDailyAtTime channel id',
+        'repeatDailyAtTime channel name',
+        'repeatDailyAtTime description');
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.showDailyAtTime(
+        0,
+        'show daily title',
+        'Daily notification shown at approximat',
+        time,
+        platformChannelSpecifics);
+  }
+   
 }
+

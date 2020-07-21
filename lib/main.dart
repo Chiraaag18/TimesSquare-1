@@ -1,13 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:news/screens/cat_news.dart';
 import 'package:news/screens/homescreen.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   // This widget is the root of your application.
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+ 
+
+
+  @override
+  initState() {
+    super.initState();
+    // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project   
+     // If you have skipped STEP 3 then change app_icon to @mipmap/ic_launcher
+   
+  }
+ 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -31,8 +48,10 @@ class MyApp extends StatelessWidget {
       home: HomeScreen(),
       routes: {
         '/Category_Screen': (ctx)=>CategoryNews(),
+        '/home_screen':(ctx)=> HomeScreen(),
       },
     );
   }
+  
 }
 
