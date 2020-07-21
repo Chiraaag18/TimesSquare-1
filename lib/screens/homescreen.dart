@@ -150,19 +150,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontSize: 18),
                           ),
               ),
-              SizedBox(height: 5),
-              data[i]['author'] == null
-                  ? Text(
-                      'Unkown Source',
-                      textAlign: TextAlign.right,
-                      style: TextStyle(fontStyle: FontStyle.italic),
-                    )
-                  : Text(
-                      'By ' + data[i]['author'],
-                      textAlign: TextAlign.right,
-                      style: TextStyle(fontStyle: FontStyle.italic),
-                    ),
-              SizedBox(height: 25),
+              
+             
+              SizedBox(height: 35),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30),
                 child: data[i]['description'] == null
@@ -180,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             data[i]['description'],
                             textAlign: TextAlign.justify,
                             style: TextStyle(
-                                fontStyle: FontStyle.italic,
+                                fontStyle: FontStyle.normal,
                                 fontWeight: FontWeight.normal,
                                 fontSize: 18),
                           ),
@@ -304,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: () {
           // Update the state of the app.
           // ...
-          _showNotificationWithDefaultSound();
+          Navigator.of(context).pushNamed('/about');
           
         },
       ),
@@ -402,7 +392,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ));
   }
    Future<void> _showDailyAtTime() async {
-    var time = Time(9, 0, 0);
+    var time = Time(22, 48, 0);
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'repeatDailyAtTime channel id',
         'repeatDailyAtTime channel name',

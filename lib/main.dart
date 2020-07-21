@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:news/screens/about.dart';
 import 'package:news/screens/cat_news.dart';
 import 'package:news/screens/homescreen.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:news/screens/intro.dart';
 
 void main() {
   runApp(MyApp());
@@ -45,10 +47,11 @@ class _MyAppState extends State<MyApp> {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: HomeScreen(),
+      home: OnBoardingPage(),
       routes: {
         '/Category_Screen': (ctx)=>CategoryNews(),
         '/home_screen':(ctx)=> HomeScreen(),
+        '/about':(ctx)=> About(),
       },
     );
   }
