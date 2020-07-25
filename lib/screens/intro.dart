@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
+import 'package:native_state/native_state.dart';
 import 'package:news/screens/homescreen.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class OnBoardingPage extends StatefulWidget {
   @override
@@ -9,24 +13,58 @@ class OnBoardingPage extends StatefulWidget {
 
 class _OnBoardingPageState extends State<OnBoardingPage> {
   final introKey = GlobalKey<IntroductionScreenState>();
-  bool isdemoover=false;
+  
 
   void _onIntroEnd(context) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => HomeScreen()),
     );
   }
-
+ 
   Widget _buildImage(String assetName) {
     return Align(
       child: Image.asset('assets/$assetName.png', width: 200.0),
       alignment: Alignment.bottomCenter,
     );
   }
+  int count=1;
+  SharedPreferences prefs;
+  getdemostatus() async{
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      prefs.setBool('isdemoover', true);
+    });
+    
+  }
+   
 
+ bool isdemoover=false;
+
+getdemostatus1() async{
+   final prefs = await SharedPreferences.getInstance();
+   setState(() {
+     isdemoover=  prefs.getBool('isdemoover')?? false;
+   });
+   
+   
+ }
+ 
+
+ 
+ void initState(){
+   super.initState();
+   getdemostatus1();
+  
+    
+   
+   
+
+ }
   @override
   Widget build(BuildContext context) {
     const bodyStyle = TextStyle(fontSize: 19.0);
+    
+    getdemostatus1();
     const pageDecoration = const PageDecoration(
       titleTextStyle: TextStyle(fontSize: 28.0, fontWeight: FontWeight.w700),
       bodyTextStyle: bodyStyle,
@@ -35,7 +73,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
       imagePadding: EdgeInsets.zero,
     );
 
-    return !isdemoover? IntroductionScreen(
+    return isdemoover? HomeScreen():IntroductionScreen(
       key: introKey,
       pages: [
         PageViewModel(
@@ -68,8 +106,18 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
         ),
         
       ],
-      onDone: () =>{ Navigator.of(context).pushNamed('/home_screen'),
-      isdemoover=true,
+      onDone: () =>{ 
+        getdemostatus(),
+        
+        
+        
+        
+        
+        Navigator.of(context).pushNamed('/home_screen'),
+      
+       
+      
+      
       },
       //onSkip: () => _onIntroEnd(context), // You can override onSkip callback
       showSkipButton: true,
@@ -86,7 +134,6 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           borderRadius: BorderRadius.all(Radius.circular(25.0)),
         ),
       ),
-    ):HomeScreen();
+    );
   }
 }
-

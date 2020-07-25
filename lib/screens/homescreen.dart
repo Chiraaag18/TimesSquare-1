@@ -11,6 +11,7 @@ import 'package:news/widgets/categorycard.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_page_indicator/flutter_page_indicator.dart';
 import 'package:share/share.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:translator/translator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -256,6 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
     flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: onSelectNotification);
+        getdemostatus1();
   }
 
   String translateddes;
@@ -264,7 +266,24 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isSwitched = false;
 
   final translator = GoogleTranslator();
+  SharedPreferences prefs;
+  getdemostatus(bool status) async{
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      prefs.setBool('isSwitched', status);
+    });
+    
+  }
 
+getdemostatus1() async{
+   final prefs = await SharedPreferences.getInstance();
+   setState(() {
+     isSwitched=  prefs.getBool('isSwitched')?? false;
+   });
+   
+   
+ }
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -304,14 +323,13 @@ class _HomeScreenState extends State<HomeScreen> {
          ,Text('Notifications',style: TextStyle(fontSize:18,fontWeight: FontWeight.bold),),
          SizedBox(width:40)
          ,Switch(value: isSwitched, onChanged: (value) async {
-           isSwitched=value;
+          getdemostatus(value);
            if(isSwitched)
              _showDailyAtTime();
             else
-               await flutterLocalNotificationsPlugin.cancelAll();
-           setState(() {
-             isSwitched=value;
-           });
+               {await flutterLocalNotificationsPlugin.cancelAll();
+              
+               }
            
           
            
