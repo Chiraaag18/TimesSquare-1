@@ -28,16 +28,15 @@ class CustomAppBar extends PreferredSize {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: preferredSize.height,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        shape: BoxShape.rectangle,
-        boxShadow: [
-          BoxShadow(blurRadius: 25.0, spreadRadius: 5.0, color: Colors.white)
-        ],
-      ),
-      child: this.child
-    );
+        height: preferredSize.height,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          shape: BoxShape.rectangle,
+          boxShadow: [
+            BoxShadow(blurRadius: 25.0, spreadRadius: 5.0, color: Colors.white)
+          ],
+        ),
+        child: this.child);
   }
 }
 
@@ -70,7 +69,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool ishindi = false;
   bool isenglish = false;
   bool isloading = true;
-
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
   Future _showNotificationWithDefaultSound() async {
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
         'your channel id', 'your channel name', 'your channel description',
@@ -152,8 +152,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontSize: 18),
                           ),
               ),
-              
-             
               SizedBox(height: 35),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30),
@@ -239,138 +237,142 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ));
   }
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
+  
   Future onSelectNotification(String payload) async {
     showDialog(
-      context: context,
-      builder: (_) {
-        
-        Navigator.of(context).pushNamed('/home_screen');
-      });}
-      bool isSwitched = false;
+        context: context,
+        builder: (_) {
+          Navigator.of(context).pushNamed('/home_screen');
+        });
+  }
+
+  bool isSwitched = false;
   void initState() {
     super.initState();
     fetchnews();
-     var initializationSettingsAndroid =
-        new AndroidInitializationSettings('@mipmap/ic_launcher'); 
+    var initializationSettingsAndroid =
+        new AndroidInitializationSettings('@mipmap/ic_launcher');
     var initializationSettingsIOS = new IOSInitializationSettings();
     var initializationSettings = new InitializationSettings(
         initializationSettingsAndroid, initializationSettingsIOS);
     flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: onSelectNotification);
-        getdemostatus1();
+    getdemostatus1();
   }
 
   String translateddes;
   String translatedtit;
   bool ischanged = false;
-  
 
   final translator = GoogleTranslator();
   SharedPreferences prefs;
-  getdemostatus(bool status) async{
+  getdemostatus(bool status) async {
     prefs = await SharedPreferences.getInstance();
     setState(() {
       prefs.setBool('isSwitched', status);
     });
-    
   }
 
-getdemostatus1() async{
-   final prefs = await SharedPreferences.getInstance();
-   setState(() {
-     isSwitched=  prefs.getBool('isSwitched')?? false;
-   });
-   
-   
- }
- 
+  getdemostatus1() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isSwitched = prefs.getBool('isSwitched') ?? false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         drawer: Drawer(
-              child: ListView(
-    // Important: Remove any padding from the ListView.
-    padding: EdgeInsets.zero,
-    children: <Widget>[
-      Container(
-        height: 100,
-        child: DrawerHeader(
-          child: Row(
+          child: ListView(
+            // Important: Remove any padding from the ListView.
+            padding: EdgeInsets.zero,
             children: <Widget>[
-              Text('Options',style: TextStyle(fontSize:25,fontWeight: FontWeight.bold),),
-              SizedBox(width:10),
-              Icon(Icons.settings)
+              Container(
+                height: 100,
+                child: DrawerHeader(
+                    child: Row(
+                      children: <Widget>[
+                        Text(
+                          'Options',
+                          style: TextStyle(
+                              fontSize: 25, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(width: 10),
+                        Icon(Icons.settings)
+                      ],
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                    )),
+              ),
+              ListTile(
+                title: Text(
+                  'About',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                onTap: () {
+                  // Update the state of the app.
+                  // ...
+                  Navigator.of(context).pushNamed('/about');
+                },
+              ),
+              Row(
+                children: <Widget>[
+                  SizedBox(width: 15),
+                  Text(
+                    'Notifications',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(width: 40),
+                  Switch(
+                    value: isSwitched,
+                    onChanged: (value) async {
+                      getdemostatus(value);
+                      
+                      if (value)
+                        await _showDailyAtTime();
+                      else {
+                        await flutterLocalNotificationsPlugin.cancelAll();
+                      }
+                      setState(() {
+                        isSwitched = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
             ],
           ),
-          decoration: BoxDecoration(
-          color: Colors.blue,
-        )
-          
-        ),
-      ),
-      ListTile(
-        title: Text('About',style: TextStyle(fontSize:18,fontWeight: FontWeight.bold),),
-        onTap: () {
-          // Update the state of the app.
-          // ...
-          Navigator.of(context).pushNamed('/about');
-          
-        },
-      ),
-     Row(
-       children: <Widget>[
-         SizedBox(width:15)
-         ,Text('Notifications',style: TextStyle(fontSize:18,fontWeight: FontWeight.bold),),
-         SizedBox(width:40)
-         ,Switch(value: isSwitched, onChanged: (value) async {
-          getdemostatus(value);
-          _showDailyAtTime();
-           if(value)
-             await _showNotification();
-            else
-               {await flutterLocalNotificationsPlugin.cancelAll();
-              
-               }
-          setState(() {
-            isSwitched=value;
-          });
-          
-          
-           
-          
-           
-         },),
-       ],
-     ),
-
-    ],
-  ),
-
         ),
         appBar: CustomAppBar(
           height: 95,
           child: Column(
-        children: <Widget>[
-          SizedBox(height: 40),
-          Row(
             children: <Widget>[
-              Builder(builder: (context)=>
-              FlatButton.icon(onPressed:()=>  Scaffold.of(context).openDrawer(), icon: Icon(Icons.menu), label: Text('')),),
-              SizedBox(width: 60),
-              Text('Times ',
-                  style: GoogleFonts.blackHanSans(
-                      textStyle: TextStyle(color: Colors.black, fontSize: 20))),
-              Image.asset(
-                'assets/newss.png',
-                height: 50,
+              SizedBox(height: 40),
+              Row(
+                children: <Widget>[
+                  Builder(
+                    builder: (context) => FlatButton.icon(
+                        onPressed: () => Scaffold.of(context).openDrawer(),
+                        icon: Icon(Icons.menu),
+                        label: Text('')),
+                  ),
+                  SizedBox(width: 60),
+                  Text('Times ',
+                      style: GoogleFonts.blackHanSans(
+                          textStyle:
+                              TextStyle(color: Colors.black, fontSize: 20))),
+                  Image.asset(
+                    'assets/newss.png',
+                    height: 50,
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
         ),
         body: Column(
           children: <Widget>[
@@ -419,8 +421,9 @@ getdemostatus1() async{
           mainAxisSize: MainAxisSize.min,
         ));
   }
-     Future<void> _showDailyAtTime() async {
-    var time = Time(5, 37, 0);
+
+  Future<void> _showDailyAtTime() async {
+    var time = Time(18, 35, 0);
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'repeatDailyAtTime channel id',
         'repeatDailyAtTime channel name',
@@ -429,13 +432,14 @@ getdemostatus1() async{
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.showDailyAtTime(
-        0,
+        UniqueKey().hashCode,
         'show daily title',
         'Daily notification shown at approximately ',
         time,
         platformChannelSpecifics);
   }
-    Future<void> _showNotification() async {
+
+  Future<void> _showNotification() async {
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'your channel id', 'your channel name', 'your channel description',
         importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
@@ -446,8 +450,4 @@ getdemostatus1() async{
         0, 'plain title', 'plain body', platformChannelSpecifics,
         payload: 'item x');
   }
-    
-
-   
 }
-
