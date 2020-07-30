@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -246,6 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
         
         Navigator.of(context).pushNamed('/home_screen');
       });}
+      bool isSwitched = false;
   void initState() {
     super.initState();
     fetchnews();
@@ -263,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String translateddes;
   String translatedtit;
   bool ischanged = false;
-  bool isSwitched = false;
+  
 
   final translator = GoogleTranslator();
   SharedPreferences prefs;
@@ -284,6 +286,7 @@ getdemostatus1() async{
    
  }
  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -324,18 +327,25 @@ getdemostatus1() async{
          SizedBox(width:40)
          ,Switch(value: isSwitched, onChanged: (value) async {
           getdemostatus(value);
-           if(isSwitched)
-             _showDailyAtTime();
+          _showDailyAtTime();
+           if(value)
+             await _showNotification();
             else
                {await flutterLocalNotificationsPlugin.cancelAll();
               
                }
+          setState(() {
+            isSwitched=value;
+          });
+          
+          
            
           
            
          },),
        ],
-     )
+     ),
+
     ],
   ),
 
@@ -409,8 +419,8 @@ getdemostatus1() async{
           mainAxisSize: MainAxisSize.min,
         ));
   }
-   Future<void> _showDailyAtTime() async {
-    var time = Time(22, 48, 0);
+     Future<void> _showDailyAtTime() async {
+    var time = Time(5, 37, 0);
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'repeatDailyAtTime channel id',
         'repeatDailyAtTime channel name',
@@ -421,10 +431,23 @@ getdemostatus1() async{
     await flutterLocalNotificationsPlugin.showDailyAtTime(
         0,
         'show daily title',
-        'Daily notification shown at approximat',
+        'Daily notification shown at approximately ',
         time,
         platformChannelSpecifics);
   }
+    Future<void> _showNotification() async {
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'your channel id', 'your channel name', 'your channel description',
+        importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+        0, 'plain title', 'plain body', platformChannelSpecifics,
+        payload: 'item x');
+  }
+    
+
    
 }
 
